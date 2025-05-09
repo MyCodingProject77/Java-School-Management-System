@@ -1,0 +1,610 @@
+
+
+    Student
+
+     
+    import java.sql.*;
+import java.util.Vector;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import javax.swing.JOptionPane; 
+import javax.swing.table.DefaultTableModel;
+public class StudentJFrame extends javax.swing.JFrame {
+
+    
+    public StudentJFrame() {
+        initComponents();
+        Connect();
+        StudentData();
+        
+    }
+
+    
+    Connection con;
+ PreparedStatement pst;
+ 
+ 
+ public void Connect(){
+ 
+        try {
+            Class.forName("com.mysql.jdbc.Driver");
+            con = DriverManager.getConnection("jdbc:mysql://localhost/schooldb","root",""); 
+        } catch (ClassNotFoundException ex) {
+            Logger.getLogger(StudentJFrame.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (SQLException ex) {
+            Logger.getLogger(StudentJFrame.class.getName()).log(Level.SEVERE, null, ex);
+        }
+          
+ 
+ 
+ }
+ 
+ 
+ private void StudentData(){
+ 
+        try {
+            int QQ;
+            
+            pst = con.prepareStatement("SELECT * FROM students");
+            ResultSet Rs = pst.executeQuery();
+            ResultSetMetaData RSMD = Rs.getMetaData();
+
+            QQ = RSMD.getColumnCount();
+            
+            DefaultTableModel DFG =(DefaultTableModel)table1.getModel(); 
+            
+            DFG.setRowCount(0);
+            while(Rs.next()){
+            Vector v2 = new Vector();
+            for(int aa=1; aa<=QQ; aa++){
+                v2.add(Rs.getString("studentid"));
+                v2.add(Rs.getString("studentname"));
+                v2.add(Rs.getString("email"));
+                v2.add(Rs.getString("address"));
+            }
+            DFG.addRow(v2);
+            }
+        } catch (SQLException ex) {
+            Logger.getLogger(StudentJFrame.class.getName()).log(Level.SEVERE, null, ex);
+        }
+                    
+                   
+                
+     
+     
+ }
+
+
+
+
+
+ private void btnInsertActionPerformed(java.awt.event.ActionEvent evt) {                                          
+        
+            
+        try {
+            String studentid = txtStudentId.getText();
+            String studentname = txtStudentName.getText();
+            String email = txtEmail.getText();
+            String address = txtAddress.getText(); 
+            
+            
+            pst = con.prepareStatement("INSERT INTO students (studentid,studentname,email,address)VALUES(?,?,?,?)");
+            
+            pst.setString(1,studentid);
+            pst.setString(2, studentname);
+            pst.setString(3,email);
+            pst.setString(4,address);
+            
+            
+            
+            int a = pst.executeUpdate();
+            
+            
+            if (a==1){
+                
+                JOptionPane.showMessageDialog(this,"Record Inserted");
+                StudentData();
+
+                
+                
+                
+            }else{
+                
+                JOptionPane.showMessageDialog(this,"Errpor, Please Try Again");
+                
+                
+                
+            }
+        } catch (SQLException ex) {
+            Logger.getLogger(StudentJFrame.class.getName()).log(Level.SEVERE, null, ex);
+        }
+            
+        
+    }                                         
+
+    private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {                                         
+        dispose();
+    }                                        
+
+    private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {                                         
+        txtStudentId.setText("");
+             txtStudentName.setText("");
+             txtEmail.setText("");
+             txtAddress.setText("");
+    }                                        
+
+    private void table1MouseClicked(java.awt.event.MouseEvent evt) {                                    
+        int selectedRow = table1.getSelectedRow(); // get selected row index
+
+    // Make sure a row is actually selected
+    if (selectedRow >= 0) {
+        String id = table1.getValueAt(selectedRow, 0).toString();
+        String name = table1.getValueAt(selectedRow, 1).toString();
+        String email = table1.getValueAt(selectedRow, 2).toString();
+        String address = table1.getValueAt(selectedRow, 3).toString();
+
+        txtStudentId.setText(id);
+        txtStudentName.setText(name);
+        txtEmail.setText(email);
+        txtAddress.setText(address);
+    }
+    }                                   
+
+    private void btnUpdateActionPerformed(java.awt.event.ActionEvent evt) {                                          
+        String studentid = txtStudentId.getText();
+        String studentname = txtStudentName.getText();
+        String email = txtEmail.getText();
+        String address = txtAddress.getText();
+        
+        try { 
+            Class.forName("com.mysql.jdbc.Driver");
+            con = DriverManager.getConnection("jdbc:mysql://localhost/schooldb","root","");
+             pst = con.prepareStatement("update students set studentname= ?,email= ?,address= ? where studentid= ?");
+             pst.setString(1,studentname);
+            pst.setString(2,email);
+            pst.setString(3,address);
+            pst.setString(4,studentid);
+            pst.executeUpdate();
+            JOptionPane.showMessageDialog(this, "Record Updated");
+            StudentData();
+        } catch (ClassNotFoundException ex) {
+            Logger.getLogger(StudentJFrame.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (SQLException ex) {
+            Logger.getLogger(StudentJFrame.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        
+    }                                         
+
+    private void btnDeleteActionPerformed(java.awt.event.ActionEvent evt) {                                          
+        try {
+            String studentid = txtStudentId.getText();
+              
+            pst=con.prepareStatement("DELETE FROM students WHERE studentid=?");
+            pst.setString(1,studentid);
+            
+            int k = pst.executeUpdate();
+            if(k==1){
+                
+                JOptionPane.showMessageDialog(null, "Record Deleted");
+                StudentData();
+                
+            }else{
+                
+                JOptionPane.showMessageDialog(null, "Error, Please try again");
+                
+            }
+        } catch (SQLException ex) {
+            Logger.getLogger(StudentJFrame.class.getName()).log(Level.SEVERE, null, ex);
+        }
+            
+    }                              
+
+
+
+
+
+
+
+    Course
+
+    import java.sql.*;
+import java.util.Vector;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import javax.swing.JOptionPane; 
+import javax.swing.table.DefaultTableModel;
+public class CourseJFrame extends javax.swing.JFrame {
+
+    
+    public CourseJFrame() {
+        initComponents();
+        Connect();
+        CourseData();
+        
+    }
+
+    
+    Connection con;
+ PreparedStatement pst;
+ 
+ 
+ public void Connect(){
+ 
+        try {
+            Class.forName("com.mysql.jdbc.Driver");
+            con = DriverManager.getConnection("jdbc:mysql://localhost/schooldb","root",""); 
+        } catch (ClassNotFoundException ex) {
+            Logger.getLogger(CourseJFrame.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (SQLException ex) {
+            Logger.getLogger(CourseJFrame.class.getName()).log(Level.SEVERE, null, ex);
+        }
+          
+ 
+ 
+ }
+ 
+ 
+ private void CourseData(){
+ 
+        try {
+            int QQ;
+            
+            pst = con.prepareStatement("SELECT * FROM courses");
+            ResultSet Rs = pst.executeQuery();
+            ResultSetMetaData RSMD = Rs.getMetaData();
+
+            QQ = RSMD.getColumnCount();
+            
+            DefaultTableModel DFG =(DefaultTableModel)table1.getModel(); 
+            
+            DFG.setRowCount(0);
+            while(Rs.next()){
+            Vector v2 = new Vector();
+            for(int aa=1; aa<=QQ; aa++){
+                v2.add(Rs.getString("courseid"));
+                v2.add(Rs.getString("course"));
+                v2.add(Rs.getString("duration"));
+                
+            }
+            DFG.addRow(v2);
+            }
+        } catch (SQLException ex) {
+            Logger.getLogger(CourseJFrame.class.getName()).log(Level.SEVERE, null, ex);
+        }
+
+
+
+
+      private void btnInsertActionPerformed(java.awt.event.ActionEvent evt) {                                          
+        
+            
+        try {
+            String courseid = txtCourseId.getText();
+            String course = txtCourse.getText();
+            String duration = txtDuration.getText();
+            
+            
+            
+            pst = con.prepareStatement("INSERT INTO courses (courseid,course,duration)VALUES(?,?,?)");
+            
+            pst.setString(1,courseid);
+            pst.setString(2,course);
+            pst.setString(3,duration);
+            
+            
+            
+            
+            int a = pst.executeUpdate();
+            
+            
+            if (a==1){
+                
+                JOptionPane.showMessageDialog(this,"Record Inserted");
+                CourseData();
+
+                
+                
+                
+            }else{
+                
+                JOptionPane.showMessageDialog(this,"Errpor, Please Try Again");
+                
+                
+                
+            }
+        } catch (SQLException ex) {
+            Logger.getLogger(CourseJFrame.class.getName()).log(Level.SEVERE, null, ex);
+        }
+            
+        
+    }                                         
+
+    private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {                                         
+        dispose();
+    }                                        
+
+    private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {                                         
+        txtCourseId.setText("");
+             txtCourse.setText("");
+             txtDuration.setText("");
+             
+    }                                        
+
+    private void table1MouseClicked(java.awt.event.MouseEvent evt) {                                    
+        int selectedRow = table1.getSelectedRow(); // get selected row index
+
+    // Make sure a row is actually selected
+    if (selectedRow >= 0) {
+        String id = table1.getValueAt(selectedRow, 0).toString();
+        String course = table1.getValueAt(selectedRow, 1).toString();
+        String duration = table1.getValueAt(selectedRow, 2).toString();
+        
+
+        txtCourseId.setText(id);
+        txtCourse.setText(course);
+        txtDuration.setText(duration);
+        
+    }
+    }                                   
+
+    private void btnUpdateActionPerformed(java.awt.event.ActionEvent evt) {                                          
+        String courseid = txtCourseId.getText();
+        String course = txtCourse.getText();
+        String duration = txtDuration.getText();
+        
+        
+        try { 
+            Class.forName("com.mysql.jdbc.Driver");
+            con = DriverManager.getConnection("jdbc:mysql://localhost/schooldb","root","");
+             pst = con.prepareStatement("update courses set course= ?,duration= ? where courseid= ?");
+             pst.setString(1,course);
+             pst.setString(2,duration);
+             pst.setString(3,courseid);
+            
+            pst.executeUpdate();
+            JOptionPane.showMessageDialog(this, "Record Updated");
+            CourseData();
+        } catch (ClassNotFoundException ex) {
+            Logger.getLogger(CourseJFrame.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (SQLException ex) {
+            Logger.getLogger(CourseJFrame.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        
+    }                                         
+
+    private void btnDeleteActionPerformed(java.awt.event.ActionEvent evt) {                                          
+        try {
+            String courseid = txtCourseId.getText();
+              
+            pst=con.prepareStatement("DELETE FROM courses WHERE courseid=?");
+            pst.setString(1,courseid);
+            
+            int k = pst.executeUpdate();
+            if(k==1){
+                
+                JOptionPane.showMessageDialog(null, "Record Deleted");
+                CourseData();
+                
+            }else{
+                
+                JOptionPane.showMessageDialog(null, "Error, Please try again");
+                
+            }
+        } catch (SQLException ex) {
+            Logger.getLogger(CourseJFrame.class.getName()).log(Level.SEVERE, null, ex);
+        }
+            
+    }                                         
+
+
+
+
+
+
+
+
+     Enrollment
+
+      import java.sql.*;
+import java.text.SimpleDateFormat;
+import java.util.Vector;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import javax.swing.JOptionPane; 
+import javax.swing.table.DefaultTableModel;
+public class EnrollJFrame extends javax.swing.JFrame {
+
+    
+    public EnrollJFrame() {
+        initComponents();
+        Connect();
+        EnrollData();
+        
+    }
+
+    
+    Connection con;
+ PreparedStatement pst;
+ 
+ 
+ public void Connect(){
+ 
+        try {
+            Class.forName("com.mysql.jdbc.Driver");
+            con = DriverManager.getConnection("jdbc:mysql://localhost/schooldb","root",""); 
+        } catch (ClassNotFoundException ex) {
+            Logger.getLogger(EnrollJFrame.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (SQLException ex) {
+            Logger.getLogger(EnrollJFrame.class.getName()).log(Level.SEVERE, null, ex);
+        }
+          
+ 
+ 
+ }
+ 
+ 
+ private void EnrollData(){
+ 
+        try {
+            int QQ;
+            
+            pst = con.prepareStatement("SELECT * FROM enrollments");
+            ResultSet Rs = pst.executeQuery();
+            ResultSetMetaData RSMD = Rs.getMetaData();
+
+            QQ = RSMD.getColumnCount();
+            
+            DefaultTableModel DFG =(DefaultTableModel)table1.getModel(); 
+            
+            DFG.setRowCount(0);
+            while(Rs.next()){
+            Vector v2 = new Vector();
+            for(int aa=1; aa<=QQ; aa++){
+                v2.add(Rs.getString("eid"));
+                v2.add(Rs.getString("studentname"));
+                v2.add(Rs.getString("course"));
+                v2.add(Rs.getString("enrolldate"));
+            }
+            DFG.addRow(v2);
+            }
+        } catch (SQLException ex) {
+            Logger.getLogger(EnrollJFrame.class.getName()).log(Level.SEVERE, null, ex);
+        }
+                    
+                   
+                
+     
+     
+ }
+
+
+
+
+
+    private void btnInsertActionPerformed(java.awt.event.ActionEvent evt) {                                          
+        
+            
+        try {
+            String eid = txtEId.getText();
+            String studentname = txtEStudentName.getText();
+            String course = txtECourse.getText();
+            
+            
+            
+            pst = con.prepareStatement("INSERT INTO enrollments (eid,studentname,course,enrolldate)VALUES(?,?,?,?)");
+            
+            pst.setString(1,eid);
+            pst.setString(2, studentname);
+            pst.setString(3,course);
+            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+            String enrolldate = sdf.format(enrollDate.getDate());
+            pst.setString(4, enrolldate);
+            
+            
+            
+            int a = pst.executeUpdate();
+            
+            
+            if (a==1){
+                
+                JOptionPane.showMessageDialog(this,"Record Inserted");
+                EnrollData();
+
+                
+                
+                
+            }else{
+                
+                JOptionPane.showMessageDialog(this,"Errpor, Please Try Again");
+                
+                
+                
+            }
+        } catch (SQLException ex) {
+            Logger.getLogger(StudentJFrame.class.getName()).log(Level.SEVERE, null, ex);
+        }
+            
+        
+    }                                         
+
+    private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {                                         
+        dispose();
+    }                                        
+
+    private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {                                         
+             txtEId.setText("");
+             txtEStudentName.setText("");
+             txtECourse.setText("");
+             
+    }                                        
+
+    private void table1MouseClicked(java.awt.event.MouseEvent evt) {                                    
+        int selectedRow = table1.getSelectedRow(); // get selected row index
+
+    // Make sure a row is actually selected
+    if (selectedRow >= 0) {
+        String id = table1.getValueAt(selectedRow, 0).toString();
+        String name = table1.getValueAt(selectedRow, 1).toString();
+        String course = table1.getValueAt(selectedRow, 2).toString();
+        
+
+        txtEId.setText(id);
+        txtEStudentName.setText(name);
+        txtECourse.setText(course);
+        
+    }
+    }                                   
+
+    private void btnUpdateActionPerformed(java.awt.event.ActionEvent evt) {                                          
+        String eid = txtEId.getText();
+        String studentname = txtEStudentName.getText();
+        String course = txtECourse.getText();
+        
+        
+        try { 
+            Class.forName("com.mysql.jdbc.Driver");
+            con = DriverManager.getConnection("jdbc:mysql://localhost/schooldb","root","");
+             pst = con.prepareStatement("update enrollments set studentname= ?,course= ?,enrolldate= ? where eid= ?");
+             pst.setString(1,studentname);
+            pst.setString(2,course);
+            pst.setString(4,eid);
+            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+            String enrolldate = sdf.format(enrollDate.getDate());
+            pst.setString(3,enrolldate);
+            pst.executeUpdate();
+            JOptionPane.showMessageDialog(this, "Record Updated");
+            EnrollData();
+        } catch (ClassNotFoundException ex) {
+            Logger.getLogger(EnrollJFrame.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (SQLException ex) {
+            Logger.getLogger(EnrollJFrame.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        
+    }                                         
+
+    private void btnDeleteActionPerformed(java.awt.event.ActionEvent evt) {                                          
+        try {
+            String eid = txtEId.getText();
+              
+            pst=con.prepareStatement("DELETE FROM enrollments WHERE eid=?");
+            pst.setString(1,eid);
+            
+            int k = pst.executeUpdate();
+            if(k==1){
+                
+                JOptionPane.showMessageDialog(null, "Record Deleted");
+                EnrollData();
+                
+            }else{
+                
+                JOptionPane.showMessageDialog(null, "Error, Please try again");
+                
+            }
+        } catch (SQLException ex) {
+            Logger.getLogger(EnrollJFrame.class.getName()).log(Level.SEVERE, null, ex);
+        }
+            
+    }                            
+
+
+  
